@@ -77,6 +77,8 @@ metadata:
 - 首选内置 JSON：`references/siff2026/siff2026-official-cndata-20260603-001.json`。
 - 字段重点：`nameCn`、`nameEn`、`date`、`weekday`、`stime`、`length`、`cinema`、`hallsName`、`cinemaAddress`、`group`、`filmId`、`remarks`、`showType`、`liveActivity`。
 - Excel 可作为人工核对或用户需要附件时的官方原始表。
+- 若用户提供影迷自制/增强版 Excel，先检查其是否与官方场次 key 完全对齐；若对齐，可优先使用其中新增的 `weekday`、`etime`、`time quantum`、`show_type`、`remarks`、`color` 等辅助字段。
+- 不要盲信官网 JSON 的 `liveActivity` 可识别全部见面场；若增强版 Excel 有 `show_type=见面场`，应以它作为见面场筛选信号，并在输出中标注来源为用户提供表格。
 - 若用户要求刷新，才重新抓官方数据，并说明刷新时间与来源 URL。
 
 ### 3. 获取优先级信号
