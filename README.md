@@ -14,8 +14,12 @@
 
 | 文件 | 说明 |
 |------|------|
-| `references/siff2026/siff2026-official-cndata-20260603-001.json` | 官方排片 JSON（1610 场） |
-| `references/siff2026/第28届上海国际电影节排片表-官方.xlsx` | 官方 Excel 原始文件 |
+| `references/siff2026/siff2026-current-schedule-lighthouse-20260604.json` | 当前首选排片 JSON（1574 场），基于灯塔专业版，含票价、4K/格式标识，并补回官网元数据 |
+| `references/siff2026/siff2026-current-schedule-lighthouse-20260604.csv` | 当前首选排片 CSV，便于人工筛选 |
+| `references/siff2026/siff2026-lighthouse-pro-schedule-20260604.xlsx` | 灯塔专业版原始排片表 |
+| `references/siff2026/siff2026-lighthouse-pro-manifest-20260604.json` | 灯塔导入说明、哈希和匹配统计 |
+| `references/siff2026/siff2026-official-cndata-20260603-001.json` | SIFF 官网抓取原始 JSON，作为历史/元数据来源 |
+| `references/siff2026/第28届上海国际电影节排片表-官方.xlsx` | SIFF 官网 Excel 原始文件 |
 | `references/siff2026/siff2026-cinema-coordinates.csv` | 44 家影院坐标 |
 | `references/siff2026/siff2026-cinema-driving-matrix-osrm.csv` | 44×44 驾车距离/时间矩阵（OSRM） |
 | `references/siff2026/siff2026-cinema-metro-matrix-estimated.csv` | 44×44 地铁移动时间矩阵 |
@@ -67,7 +71,8 @@ git clone https://github.com/fffonion/siff26-ticket-planning.git \
 
 ## 数据来源
 
-- 排片数据：SIFF 官网 (siff.com) 抓取
+- 当前排片/票价/4K格式：灯塔专业版 Excel
+- 官网元数据：SIFF 官网 (siff.com) 抓取
 - 影院坐标：OpenStreetMap Overpass API
 - 驾车时间：OSRM 公共接口
 - 地铁邻接：[MetroFlow](https://figshare.com/collections/ARIZONA_Sun/4209384)

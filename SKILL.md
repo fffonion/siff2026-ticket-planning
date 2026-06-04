@@ -1,7 +1,7 @@
 ---
 name: siff26-ticket-planning
 description: 用于根据任意影片清单与偏好规划 SIFF 2026 买票和观影行程；优先使用内置官方排片数据，并评估片长、散场缓冲、跨影院驾车时间与备选场次。
-version: 1.2.0
+version: 1.3.0
 author: Hermes Agent
 metadata:
   hermes:
@@ -17,7 +17,12 @@ metadata:
 
 本 skill 内置 SIFF 2026 官方排片资料。除非用户明确要求刷新，否则不要重新抓官方排片页，优先读取本地参考文件：
 
-- `references/siff2026/siff2026-official-cndata-20260603-001.json`
+- `references/siff2026/siff2026-current-schedule-lighthouse-20260604.json`：当前首选排片数据，基于灯塔专业版，含价格、4K/格式标识，并补回官网元数据。
+- `references/siff2026/siff2026-current-schedule-lighthouse-20260604.csv`：同上，便于表格筛选。
+- `references/siff2026/siff2026-lighthouse-pro-schedule-normalized-20260604.csv` / `.json`：灯塔专业版原表规范化结果。
+- `references/siff2026/siff2026-lighthouse-pro-schedule-20260604.xlsx`：灯塔专业版原始 Excel。
+- `references/siff2026/siff2026-lighthouse-pro-manifest-20260604.json`：灯塔导入说明、哈希和匹配统计。
+- `references/siff2026/siff2026-official-cndata-20260603-001.json`：官网抓取原始 JSON，作为历史/元数据来源。
 - `references/siff2026/第28届上海国际电影节排片表-官方.xlsx`
 - `references/siff2026/siff2026-scrape-summary.json`
 - `references/siff2026/manifest.json`
@@ -38,8 +43,10 @@ metadata:
 - 每场散场后默认加 30 分钟缓冲，再开始移动。
 - 同影院连场优先，但不要把「同影院中间硬等一小时以上」自动当成优点；长间隔要评估是否回家/回住处/去附近休息更合理。
 - 若用户给出家/住处/出发点，必须把「离家远近」纳入目标函数：优先近影院，标出偏远影院，并主动寻找更近备选场次。
-- 高分片和稀缺场次优先，不让低优先级片破坏高优先级片的可行性。
+- 高优先级片和稀缺场次优先，不让低优先级片破坏高优先级片的可行性。
+- 工作日白天是否可用只是一个约束开关：用户说可用时，允许把它作为备选优化；但若用户随后指定沿用某个旧方案，旧方案优先。
 - 若全覆盖会造成高风险转场、偏远影院或无意义长等待，给出「近家舒适版」「全覆盖版本」或替换建议。
+- 若用户引用、指定或说「按最初/上一版/这个方案」调整行程，必须保持该方案的日期、影院和连场结构，只做用户明确要求的删减、替换或局部调整；不要擅自重新全局优化、补新场次或压缩天数。删掉影片后留下的空档可以标注为休息/回家，除非用户要求重新排。
 
 规划前必须主动询问会显著影响行程质量的锚点信息，不要只按影院之间转场优化。至少询问：
 
@@ -58,7 +65,9 @@ metadata:
 
 - 将用户给出的家、住处、公司、常用停车点、可休息商圈等视为本次会话的 `anchor_points`，只保存在临时计算上下文。
 - 允许用户只给大致地标，不要求精确门牌。
+- 若锚点是上海小区/弄堂名，Nominatim/OSM 常查不到；先用 web_search 查权威或地图页确认地址，再优先取地图页坐标（例如 360/高德/百度页面）。国内地图坐标多为 GCJ-02/BD-09，不要直接喂给 OSRM；先换算到 WGS84，或明确标注坐标系与估算误差。
 - 对每个影院计算到各 anchor 的距离/耗时；优先使用 OSRM 或地图/交通工具查询，无法查实时交通时标注为估算。
+- 锚点加入后必须重排方案，而不只是给原方案补距离说明：把明显偏离家点/夜间返程不划算的影院替换成同片更近场次，再保留必要的全覆盖或高分优先版本。
 - 为影院打离锚点等级，例如：近 / 可接受 / 偏远；阈值优先用用户给定值，未给定时用默认假设并在输出中说明。
 - 对同日两场之间的长间隔，计算是否值得回到某个 anchor：
   - `可停留时间 = 下一场开始 - 上一场散场 - 离场缓冲 - 去 anchor 耗时 - 从 anchor 到下一影院耗时 - 提前到场缓冲`
@@ -74,8 +83,9 @@ metadata:
 
 ### 2. 读取 SIFF 2026 排片
 
-- 首选内置 JSON：`references/siff2026/siff2026-official-cndata-20260603-001.json`。
-- 字段重点：`nameCn`、`nameEn`、`date`、`weekday`、`stime`、`length`、`cinema`、`hallsName`、`cinemaAddress`、`group`、`filmId`、`remarks`、`showType`、`liveActivity`。
+- 首选当前版 JSON：`references/siff2026/siff2026-current-schedule-lighthouse-20260604.json`。
+- 该文件基于灯塔专业版 Excel，字段重点：`nameCn`、`nameCnBase`、`date`、`dateCn`、`weekday`、`stime`、`etime`、`lengthMin`、`priceYuan`、`cinema`、`hallsName`、`cinemaAddress`、`formatFlags`、`is4k`、`group`、`director`、`country`、`remarks`、`showType`。
+- 需要原官网字段或核对历史差异时，再读旧官网 JSON：`references/siff2026/siff2026-official-cndata-20260603-001.json`。旧官网 JSON 的时间可能落后于灯塔表，不能再作为价格/格式/当前时间的首选。
 - Excel 可作为人工核对或用户需要附件时的官方原始表。
 - 若用户提供影迷自制/增强版 Excel，先检查其是否与官方场次 key 完全对齐；若对齐，可优先使用其中新增的 `weekday`、`etime`、`time quantum`、`show_type`、`remarks`、`color` 等辅助字段。
 - 不要盲信官网 JSON 的 `liveActivity` 可识别全部见面场；若增强版 Excel 有 `show_type=见面场`，应以它作为见面场筛选信号，并在输出中标注来源为用户提供表格。
@@ -89,7 +99,8 @@ metadata:
 2. 用户指定的平台评分。
 3. 常见评分与评价人数：豆瓣、IMDb、Letterboxd 等。
 4. 影展价值：4K 修复、导演回顾、少见格式、见面会、稀缺场次、特殊厅。
-5. 时间与交通可行性。
+5. 票价：优先读 `priceYuan`，输出买票方案时给出单场价格和总价；若为空才标注未知。
+6. 时间与交通可行性。
 
 不要编评分。查不到就写「未知」。
 
@@ -187,6 +198,8 @@ SIFF 2026 的影院间交通参考：
 - 日期、星期、开始时间
 - 片长、散场时间、+30m 后可离场时间
 - 影院、影厅、地址
+- 票价（`priceYuan`）
+- 格式标识：`is4k` 与 `formatFlags`；不要只看旧表的 `resolution` 字段
 - 与用户本次提供的家/住处/公司/停靠点的匿名距离等级，例如「距家点A：近 / 可接受 / 偏远」
 - 交通与缓冲说明
 - 长间隔处理：留在影院附近 / 回家点A / 回公司点B / 换场次

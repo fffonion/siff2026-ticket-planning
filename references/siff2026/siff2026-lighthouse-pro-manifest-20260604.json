@@ -1,0 +1,92 @@
+{
+  "source_file": "【灯塔专业版】第28届上海国际电影节排片表.xlsx",
+  "generated_at_utc": "2026-06-04T10:00:07Z",
+  "row_count": 1574,
+  "official_row_count": 1574,
+  "matched_official_rows": 1571,
+  "full_key_matches": 1559,
+  "slot_fallback_matches": 12,
+  "missing_matches": 3,
+  "title_mismatch_fallback_count": 12,
+  "fields_added": [
+    "priceYuan",
+    "nameCnLighthouse",
+    "formatFlagsLighthouse",
+    "is4kLighthouse",
+    "cinemaAddressLighthouse",
+    "lighthouseMatchMethod"
+  ],
+  "price_distribution": {
+    "70": 986,
+    "90": 197,
+    "110": 67,
+    "60": 57,
+    "80": 125,
+    "100": 41,
+    "120": 15,
+    "150": 3,
+    "50": 35,
+    "280": 2,
+    "30": 27,
+    "240": 5,
+    "220": 3,
+    "140": 5,
+    "40": 3,
+    "160": 3
+  },
+  "format_distribution": {
+    "CINITY": 144,
+    "4K": 746,
+    "LUXE": 227,
+    "ONYX": 100,
+    "IMAX/4K": 36,
+    "IMAX": 51,
+    "DOLBY VISION/4K": 13,
+    "DOLBY VISION": 13,
+    "3D": 23,
+    "XR": 53
+  },
+  "notes": [
+    "Full match key strips format tags from title then uses date/start/cinema/hall after normalizing whitespace and parentheses.",
+    "Fallback slot match uses date/start/cinema/hall when titles differ but the screening slot is unique.",
+    "Price is stored as yuan string from 灯塔专业版 Excel.",
+    "4K flag is derived from title/hall format keywords in the lighthouse table."
+  ],
+  "files": {
+    "siff2026-lighthouse-pro-schedule-20260604.xlsx": {
+      "bytes": 229095,
+      "sha256": "bdebc51d270e11ddd59dce4e6cbc00f7a97e848f9bc50b86619e2a2e964681be"
+    },
+    "siff2026-lighthouse-pro-schedule-normalized-20260604.csv": {
+      "bytes": 274972,
+      "sha256": "f0857f095d861f3f1dc521d55ea30e54284483d2a5ea7b8a08d5ed0beb75daee"
+    },
+    "siff2026-lighthouse-pro-schedule-normalized-20260604.json": {
+      "bytes": 585912,
+      "sha256": "2104ba85a9fa6a0ca7fc22712a1ea7cdd2bf090ebb2b76920591bfc3727dc7ff"
+    },
+    "siff2026-official-cndata-20260603-001.enriched-lighthouse-20260604.json": {
+      "bytes": 2165794,
+      "sha256": "ac07e14a2fb55bcdc7eb7d1b8e7869ce275fd4712e7d336ba62a9d5509dc6731"
+    }
+  },
+  "current_schedule_files": {
+    "siff2026-current-schedule-lighthouse-20260604.json": {
+      "bytes": 1042515,
+      "sha256": "30aeaf4215bde6df23bf7f60d7b0102ecd7ed5abae960db9ad0047dd3afc4569"
+    },
+    "siff2026-current-schedule-lighthouse-20260604.csv": {
+      "bytes": 499579,
+      "sha256": "95b694b21a2654b23cd65d06bdf7bece042656e21d631a5be5f6358150fe20be"
+    }
+  },
+  "metadata_match_methods": {
+    "full": 1559,
+    "title_cinema_hall": 3,
+    "slot": 12
+  },
+  "current_schedule_notes": [
+    "Use siff2026-current-schedule-lighthouse-20260604.json as current schedule when price/format/current times are needed.",
+    "This file is based on Lighthouse Pro rows, with official metadata filled back where matched."
+  ]
+}
